@@ -26,7 +26,7 @@ import { useSupabaseData } from '../hooks/useSupabaseData';
 import ProductForm from '../components/admin/ProductForm';
 import BannerForm from '../components/admin/BannerForm';
 import BrandForm from '../components/admin/BrandForm';
-import { signOut, type User } from '../lib/auth';
+import { signOut, isAdmin, type User } from '../lib/auth';
 import type { Database } from '../lib/supabase';
 
 type Product = Database['public']['Tables']['products']['Row'];
@@ -35,14 +35,23 @@ type Brand = Database['public']['Tables']['brands']['Row'];
 type Banner = Database['public']['Tables']['banners']['Row'];
 type Order = Database['public']['Tables']['orders']['Row'];
 
-interface AdminPageProps {
+interface AdminDashboardProps {
   user: User;
   onNavigate: (page: string) => void;
 }
 
-const AdminPage: React.FC<AdminPageProps> = ({ user, onNavigate }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onNavigate }) => {
   const [activeTab, setActiveTab] = useState<'products' | 'banners' | 'navigation' | 'brands' | 'orders' | 'analytics'>('products');
   const [dataLoading, setDataLoading] = useState(true);
+
+  // Check if user has admin access
+  useEffect(() => {
+    if (!isAdmin(user)) {
+      // Redirect to login if not admin
+      onNavigate('admin/login');
+      return;
+    }
+  }, [user, onNavigate]);
 
   // Fetch data from Supabase
   const { data: products, loading: productsLoading, error: productsError } = useSupabaseData('products', { realtime: true });
@@ -63,13 +72,32 @@ const AdminPage: React.FC<AdminPageProps> = ({ user, onNavigate }) => {
     }).catch(console.error);
   };
 
+  // Redirect if not admin
+  if (!isAdmin(user)) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-600 mb-4">You don't have permission to access the admin dashboard.</p>
+          <button
+            onClick={() => onNavigate('admin/login')}
+            className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Show loading screen while data is being fetched
   if (dataLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-black border-t-transparent mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Admin Panel</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Admin Dashboard</h2>
           <p className="text-gray-600">Connecting to database...</p>
         </div>
       </div>
@@ -120,7 +148,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ user, onNavigate }) => {
                 <h1 className="text-xl font-serif font-bold text-black">
                   Jowhara Admin
                 </h1>
-                <p className="text-xs text-gray-500 -mt-1">Management Panel</p>
+                <p className="text-xs text-gray-500 -mt-1">Management Dashboard</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -999,4 +1027,4 @@ const AnalyticsTab: React.FC<{ products: Product[]; orders: Order[]; categories:
   );
 };
 
-export default AdminPage;
+export default AdminDashboard;

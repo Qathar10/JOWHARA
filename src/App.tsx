@@ -7,10 +7,10 @@ import ShopPage from './pages/ShopPage';
 import ProductPage from './pages/ProductPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
-import AdminPage from './pages/AdminPage';
+import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 import { useProducts, useCategories, useBrands } from './data/supabaseData';
-import { getCurrentUser, onAuthStateChange, type User } from './lib/auth';
+import { getCurrentUser, onAuthStateChange, isAdmin, type User } from './lib/auth';
 import type { Database } from './lib/supabase';
 
 type Product = Database['public']['Tables']['products']['Row'];
@@ -76,7 +76,7 @@ function App() {
       return <AdminLogin onNavigate={handleNavigate} />;
     }
 
-    return <AdminPage user={user} onNavigate={handleNavigate} />;
+    return <AdminDashboard user={user} onNavigate={handleNavigate} />;
   }
   
   // Show loading state

@@ -220,13 +220,12 @@ const logAdminActivity = async (
   newValues: any
 ) => {
   try {
-    const adminUserStr = localStorage.getItem('admin_user');
-    if (!adminUserStr) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || user.app_metadata?.role !== 'admin') return;
 
-    const adminUser = JSON.parse(adminUserStr);
-    
     await supabase.from('admin_activity_logs').insert({
-      admin_id: adminUser.id,
+      user_id: user.id,
+      user_email: user.email,
       action,
       table_name: tableName,
       record_id: recordId,
