@@ -1,4 +1,3 @@
-import React from 'react';
 import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -10,7 +9,7 @@ import ContactPage from './pages/ContactPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 import { useProducts, useCategories, useBrands } from './data/supabaseData';
-import { getCurrentUser, onAuthStateChange, isAdmin, type User } from './lib/auth';
+import { getCurrentUser, onAuthStateChange, type User } from './lib/auth';
 import type { Database } from './lib/supabase';
 
 type Product = Database['public']['Tables']['products']['Row'];
