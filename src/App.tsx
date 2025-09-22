@@ -7,7 +7,9 @@ import ProductPage from './pages/ProductPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import AdminDashboard from './pages/AdminDashboard';
+import EnhancedAdminDashboard from './pages/EnhancedAdminDashboard';
 import AdminLogin from './pages/AdminLogin';
+import ConnectionTest from './pages/ConnectionTest';
 import { useProducts, useCategories, useBrands } from './data/supabaseData';
 import { getCurrentUser, onAuthStateChange, type User } from './lib/auth';
 import type { Database } from './lib/supabase';
@@ -58,8 +60,13 @@ function App() {
     setCurrentPage('shop');
   };
 
+  // Handle connection test route
+  if (currentPage === 'connection-test') {
+    return <ConnectionTest />;
+  }
+
   // Handle admin routes
-  if (currentPage === 'admin' || currentPage === 'admin/login') {
+  if (currentPage === 'admin' || currentPage === 'admin/login' || currentPage === 'enhanced-admin') {
     if (authLoading) {
       return (
         <div className="min-h-screen bg-white flex items-center justify-center">
@@ -75,7 +82,8 @@ function App() {
       return <AdminLogin onNavigate={handleNavigate} />;
     }
 
-    return <AdminDashboard user={user} onNavigate={handleNavigate} />;
+    // Use enhanced admin dashboard
+    return <EnhancedAdminDashboard user={user} onNavigate={handleNavigate} />;
   }
   
   // Show loading state

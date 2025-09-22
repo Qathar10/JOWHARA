@@ -1,13 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Create client with placeholders to prevent app crash
-// Note: Real Supabase credentials need to be provided for full functionality
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Enhanced Database types with new schema
+// Test connection function
+export const testConnection = async () => {
+  try {
+    const { data, error } = await supabase.from('categories').select('count').limit(1);
+    return { success: !error, error: error?.message };
+  } catch (err) {
+    return { success: false, error: (err as Error).message };
+  }
+};
+
+// Enhanced Database types matching your schema
 export interface Database {
   public: {
     Tables: {
